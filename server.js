@@ -22,15 +22,6 @@ app.use("/api/areas", areaRoutes);
 app.use("/api/incidencias", incidenciaRoutes);
 app.use("/api/auth", authRoutes);
 
-// Validar conexión a la base de datos
-db.connect((err) => {
-  if (err) {
-    console.error("Error al conectar a la base de datos:", err.message);
-  } else {
-    console.log("Conexión exitosa a la base de datos.");
-  }
-});
-
 // Ruta base
 app.get("/", (req, res) => {
   res.send("¡API de DB Incidencias corriendo!");
