@@ -1,18 +1,35 @@
-const express = require('express');
-const cors = require('cors');
-const dotenv = require('dotenv');
+const express = require("express");
+const mysql = require("mysql");
+require("dotenv").config();
 
-dotenv.config();
 const app = express();
-const port = process.env.PORT || 3000;
 
-app.use(cors());
-app.use(express.json());
+// Configuración del puerto
+const PORT = process.env.PORT || 3000;
 
-app.get('/', (req, res) => {
-  res.send('API Tambini está funcionando correctamente!');
+// Configuración de la conexión a la base de datos
+const db = mysql.createConnection({
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+  });
+
+// Validar conexión a la base de datos
+db.connect((err) => {
+  if (err) {
+    console.error("Error al conectar a la base de datos:", err.message);
+  } else {
+    console.log("Conexión exitosa a la base de datos.");
+  }
 });
 
-app.listen(port, () => {
-  console.log(`Servidor ejecutándose en http://localhost:${port}`);
+// Ruta base
+app.get("/", (req, res) => {
+  res.send("¡API de DB Incidencias corriendo!");
+});
+
+// Levantar el servidor
+app.listen(PORT, () => {
+  console.log(`Servidor corriendo en http://localhost:${PORT}`);
 });
