@@ -9,7 +9,7 @@ const app = express();
 const areaRoutes = require("./src/routes/areaRoutes");
 const incidenciaRoutes = require("./src/routes/incidenciaRoutes");
 const authRoutes = require("./src/routes/authRoutes");
-const errorHandler = require("./middleware/errorHandler");
+const errorHandler = require("./src/middleware/errorHandler");
 
 // Configuración del puerto
 const PORT = process.env.PORT || 3000;
