@@ -2,6 +2,8 @@ const express = require("express");
 const cors = require("cors"); // Importar CORS
 require("dotenv").config(); // Cargar las variables de entorno
 const db = require("./src/config/dbConfig"); // Importar configuración de la base de datos
+// Importar el módulo body-parser
+const bodyParser = require('body-parser');
 
 const app = express();
 const areaRoutes = require("./src/routes/areaRoutes");
