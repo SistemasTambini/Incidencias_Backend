@@ -35,6 +35,11 @@ const Incidencia = sequelize.define("Incidencia", {
     type: DataTypes.TEXT,
     allowNull: true,
   },
+},
+{
+  freezeTableName: true, // Desactiva el plural
+  timestamps: false,     // Desactiva los campos createdAt y updatedAt si no los usas
 });
+
 
 module.exports = Incidencia;

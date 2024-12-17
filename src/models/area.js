@@ -11,6 +11,11 @@ const Area = sequelize.define("Area", {
     type: DataTypes.STRING(100),
     allowNull: false,
   },
-});
+},
+  {
+    freezeTableName: true, // Desactiva el plural
+    timestamps: false,     // Desactiva los campos createdAt y updatedAt si no los usas
+  });
+
 
 module.exports = Area;

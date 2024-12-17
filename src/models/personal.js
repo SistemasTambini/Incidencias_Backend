@@ -32,6 +32,10 @@ const Personal = sequelize.define("Personal", {
     type: DataTypes.STRING(100),
     allowNull: false,
   },
+},
+{
+  freezeTableName: true, // Desactiva el plural
+  timestamps: false,     // Desactiva los campos createdAt y updatedAt si no los usas
 });
 
 module.exports = Personal;
