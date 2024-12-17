@@ -1,15 +1,23 @@
-// Middleware para verificar si el cuerpo de la solicitud tiene los campos necesarios
-const validateLoginFields = (req, res, next) => {
-    const { usuario, password } = req.body;
-  
-    // Verificar si los campos 'usuario' y 'password' están presentes
-    if (!usuario || !password) {
-      return res.status(400).json({ message: "Usuario y contraseña son requeridos" });
-    }
-  
-    // Si todo es válido, pasamos al siguiente middleware o controlador
+const jwt = require("jsonwebtoken");
+
+const verifyToken = (req, res, next) => {
+  // Obtener el token de los encabezados de la solicitud
+  const token = req.header("Authorization")?.replace("Bearer ", "");
+
+  if (!token) {
+    return res.status(401).json({ message: "Acceso denegado. Token no proporcionado." });
+  }
+
+  try {
+    // Verificar el token
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    // Agregar la información del usuario decodificada al objeto 'req'
+    req.user = decoded;
     next();
-  };
-  
-  module.exports = { validateLoginFields };
-  
+  } catch (err) {
+    res.status(400).json({ message: "Token inválido" });
+  }
+};
+
+module.exports = { verifyToken };

@@ -1,4 +1,5 @@
 const Personal = require("../models/personal");
+const jwt = require("jsonwebtoken");
 
 // Login de usuario
 const login = async (req, res) => {
@@ -22,11 +23,19 @@ const login = async (req, res) => {
       return res.status(401).json({ message: "Contraseña incorrecta" });
     }
 
-    // Login exitoso
-    res.status(200).json({ message: "Login exitoso", user });
+    // Generar el token JWT
+    const token = jwt.sign(
+      { id: user.id, usuario: user.usuario, nombre: user.nombre },
+      process.env.JWT_SECRET, // Se recomienda usar una variable de entorno
+      { expiresIn: "1h" } // El token expirará en 1 hora
+    );
+
+    // Login exitoso y enviar el token
+    res.status(200).json({ message: "Login exitoso", token });
   } catch (err) {
     res.status(500).json({ message: "Error al iniciar sesión", error: err.message });
   }
 };
 
 module.exports = { login };
+
