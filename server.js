@@ -1,19 +1,21 @@
 const express = require("express");
-const mysql = require("mysql");
-require("dotenv").config();
+const cors = require("cors"); // Importar CORS
+require("dotenv").config(); // Cargar las variables de entorno
+const db = require("./src/config/dbConfig"); // Importar configuración de la base de datos
 
 const app = express();
 
 // Configuración del puerto
 const PORT = process.env.PORT || 3000;
 
-// Configuración de la conexión a la base de datos
-const db = mysql.createConnection({
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
-  });
+// Habilitar CORS
+app.use(cors());
+app.use(bodyParser.json()); // Soporte para JSON en las solicitudes
+
+// Rutas
+app.use("/api/areas", areaRoutes);
+app.use("/api/incidencias", incidenciaRoutes);
+app.use("/api/auth", authRoutes);
 
 // Validar conexión a la base de datos
 db.connect((err) => {
