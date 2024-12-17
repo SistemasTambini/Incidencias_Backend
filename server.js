@@ -9,6 +9,7 @@ const app = express();
 const areaRoutes = require("./src/routes/areaRoutes");
 const incidenciaRoutes = require("./src/routes/incidenciaRoutes");
 const authRoutes = require("./src/routes/authRoutes");
+const errorHandler = require("./middleware/errorHandler");
 
 // Configuración del puerto
 const PORT = process.env.PORT || 3000;
@@ -21,6 +22,9 @@ app.use(bodyParser.json()); // Soporte para JSON en las solicitudes
 app.use("/api/areas", areaRoutes);
 app.use("/api/incidencias", incidenciaRoutes);
 app.use("/api/auth", authRoutes);
+
+// Middleware de manejo de errores
+app.use(errorHandler);
 
 // Ruta base
 app.get("/", (req, res) => {

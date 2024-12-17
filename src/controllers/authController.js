@@ -13,10 +13,10 @@ const login = async (req, res) => {
       return res.status(404).json({ message: "Usuario no encontrado" });
     }
 
-    // Comparar las contraseñas
-    const isPasswordValid = await bcrypt.compare(password, user.password);
+    // Comparar las contraseñas con bcrypt
+    const match = await bcrypt.compare(password, user.password);
 
-    if (!isPasswordValid) {
+    if (!match) {
       return res.status(401).json({ message: "Contraseña incorrecta" });
     }
 
