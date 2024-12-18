@@ -12,6 +12,7 @@ const authRoutes = require("./src/routes/authRoutes");
 const errorHandler = require("./src/middleware/errorHandler");
 
 // Configuración del puerto
+const HOST = process.env.HOST || "127.0.0.1";
 const PORT = process.env.PORT || 3000;
 
 // Habilitar CORS
@@ -32,6 +33,6 @@ app.get("/", (req, res) => {
 });
 
 // Levantar el servidor
-app.listen(PORT, () => {
-  console.log(`Servidor corriendo en http://localhost:${PORT}`);
+app.listen(PORT,HOST, () => {
+  console.log(`Servidor corriendo en http://${HOST}:${PORT}`);
 });
