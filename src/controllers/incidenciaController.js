@@ -1,11 +1,22 @@
+const sequelize = require("../config/dbConfig");
 const Incidencia = require("../models/incidencia");
 
-// Obtener todas las incidencias
+// Obtener todas las incidencias con el procedimiento almacenado
 const getAllIncidencias = async (req, res) => {
   try {
-    const incidencias = await Incidencia.findAll(); // Consulta todas las incidencias
-    res.status(200).json(incidencias);
+    // Ejecutamos el procedimiento almacenado
+    const [results, metadata] = await sequelize.query('CALL sp_mostrarIncidencias();', {
+      type: sequelize.QueryTypes.SELECT  // Especificamos que esperamos un conjunto de resultados SELECT
+    });
+
+    // Verifica los resultados que están siendo retornados
+    console.log("Resultados del SP:", results);  // Muestra los resultados para depuración
+
+    // Devuelve los resultados obtenidos del procedimiento almacenado
+    res.status(200).json(results); // Devolvemos los resultados obtenidos
   } catch (err) {
+    // Manejo de errores si algo sale mal
+    console.error("Error:", err);  // Log de errores
     res.status(500).json({ message: "Error al obtener las incidencias", error: err.message });
   }
 };
@@ -38,4 +49,4 @@ const createIncidencia = async (req, res) => {
   }
 };
 
-module.exports = { getAllIncidencias,createIncidencia };
+module.exports = { getAllIncidencias, createIncidencia };
