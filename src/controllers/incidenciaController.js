@@ -9,8 +9,7 @@ const getAllIncidencias = async (req, res) => {
       type: sequelize.QueryTypes.SELECT  // Especificamos que esperamos un conjunto de resultados SELECT
     });
 
-    // Verifica los resultados que están siendo retornados
-    console.log("Resultados del SP:", results);  // Muestra los resultados para depuración
+    
 
     // Devuelve los resultados obtenidos del procedimiento almacenado
     res.status(200).json(results); // Devolvemos los resultados obtenidos
@@ -31,7 +30,7 @@ const createIncidencia = async (req, res) => {
   }
 
   try {
-    // Crear la incidencia
+    // Crear la incidencia con estado por defecto como '1'
     const nuevaIncidencia = await Incidencia.create({
       problema,
       atencion,
@@ -40,6 +39,7 @@ const createIncidencia = async (req, res) => {
       fecha,
       prioridad,
       observacion,
+      estado: '1', // Establecer estado por defecto como '1'
     });
 
     // Responder con la incidencia creada
@@ -48,5 +48,6 @@ const createIncidencia = async (req, res) => {
     res.status(500).json({ message: "Error al crear la incidencia", error: err.message });
   }
 };
+
 
 module.exports = { getAllIncidencias, createIncidencia };

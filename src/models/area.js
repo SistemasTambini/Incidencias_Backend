@@ -11,6 +11,10 @@ const Area = sequelize.define("Area", {
     type: DataTypes.STRING(100),
     allowNull: false,
   },
+  estado: {
+    type: DataTypes.STRING(5),
+    allowNull: false,
+  }
 },
   {
     freezeTableName: true, // Desactiva el plural

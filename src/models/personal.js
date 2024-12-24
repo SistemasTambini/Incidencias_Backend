@@ -32,6 +32,10 @@ const Personal = sequelize.define("Personal", {
     type: DataTypes.STRING(100),
     allowNull: false,
   },
+  estado: {
+    type: DataTypes.STRING(5),
+    allowNull: false,
+  },
 },
 {
   freezeTableName: true, // Desactiva el plural

@@ -10,6 +10,8 @@ const areaRoutes = require("./src/routes/areaRoutes");
 const incidenciaRoutes = require("./src/routes/incidenciaRoutes");
 const authRoutes = require("./src/routes/authRoutes");
 const userRoutes = require("./src/routes/userRoutes")
+const reporteRoutes = require("./src/routes/reporteRoutes")
+const dashboardRoutes = require("./src/routes/dashboardRoutes")
 const errorHandler = require("./src/middleware/errorHandler");
 
 // Configuración del puerto
@@ -24,7 +26,9 @@ app.use(bodyParser.json()); // Soporte para JSON en las solicitudes
 app.use("/api/areas", areaRoutes);
 app.use("/api/incidencias", incidenciaRoutes);
 app.use("/api/auth", authRoutes);
-app.use("/api/user", userRoutes)
+app.use("/api/user", userRoutes);
+app.use("/api/reporte",reporteRoutes);
+app.use("/api/dashboard",dashboardRoutes)
 
 // Middleware de manejo de errores
 app.use(errorHandler);

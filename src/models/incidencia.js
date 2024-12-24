@@ -35,6 +35,10 @@ const Incidencia = sequelize.define("Incidencia", {
     type: DataTypes.TEXT,
     allowNull: true,
   },
+  estado: {
+    type: DataTypes.STRING(5),
+    allowNull: false,
+  }
 },
 {
   freezeTableName: true, // Desactiva el plural
