@@ -34,7 +34,7 @@ const login = async (req, res) => {
     );
 
     // Login exitoso y enviar el token
-    res.status(200).json({ message: "Login exitoso", token, nombre: user.nombre, apellido: user.apellido });
+    res.status(200).json({ message: "Login exitoso", token, nombre: user.nombre, apellido: user.apellido, usuario: user.usuario });
   } catch (err) {
     res.status(500).json({ message: "Error al iniciar sesión", error: err.message });
   }
