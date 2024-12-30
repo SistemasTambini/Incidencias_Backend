@@ -35,7 +35,7 @@ app.use(errorHandler);
 
 // Ruta base
 app.get("/", (req, res) => {
-  res.send("¡API de DB Incidencias corriendo!");
+  res.send("¡API de DB Incidencias corriendo! pipipipi");
 });
 
 // Levantar el servidor

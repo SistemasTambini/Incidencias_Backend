@@ -1,4 +1,5 @@
 const Personal = require("../models/personal");
+const Cargo = require("../models/cargo")
 const sequelize = require("../config/dbConfig"); 
 
 // Obtener todos los usuarios activos (estado = 1) con nombre y apellido concatenados
@@ -9,7 +10,8 @@ const getAllUsuarios = async (req, res) => {
         [sequelize.literal("CONCAT(nombre, ' ', apellido)"), "nombreCompleto"],
       ],
       where: {
-        estado: 1,  // Filtra solo los usuarios con estado = 1
+        estado: 1,
+        cargo:1  // Filtra solo los usuarios con estado = 1
       }
     });
 
@@ -20,6 +22,40 @@ const getAllUsuarios = async (req, res) => {
     res.status(200).json(usuarios);
   } catch (err) {
     res.status(500).json({ message: "Error al obtener los usuarios", error: err.message });
+  }
+};
+
+const getAllUsuario = async (req, res) => {
+  try {
+    // Consulta el personal donde el estado sea igual a 1 e incluye el nombre del área desde Cargo
+    const personal = await Personal.findAll({
+      //where: { estado: 1 },
+      include: [
+        {
+          model: Cargo, // Modelo relacionado
+          attributes: ["nombre"], // Solo selecciona el campo 'nombre' de Cargo
+        },
+      ],
+    });
+
+    // Mapea los resultados para ajustar el formato de la respuesta
+    const formattedPersonal = personal.map((p) => ({
+      id: p.id,
+      usuario: p.usuario,
+      nombre: p.nombre,
+      apellido: p.apellido,
+      correo: p.correo,
+      password: p.password,
+      cargo: p.Cargo?.nombre || null, // Reemplaza cargo:1 por el nombre del cargo
+      estado: p.estado,
+    }));
+
+    res.status(200).json(formattedPersonal); // Envía la respuesta formateada
+  } catch (err) {
+    res.status(500).json({
+      message: "Error al obtener el personal",
+      error: err.message,
+    });
   }
 };
 
@@ -74,14 +110,9 @@ const changePassword = async (req, res) => {
   }
 };
 
-// Función para actualizar los datos del usuario (sin cambiar la contraseña)
 const updateUser = async (req, res) => {
   const { usuario } = req.params;
   const { nombre, apellido, correo, estado } = req.body;
-
-  if (!usuario || !nombre || !apellido || !correo || estado === undefined) {
-    return res.status(400).json({ message: "Nombre, apellido, correo y estado son requeridos" });
-  }
 
   try {
     // Buscar el usuario por nombre de usuario
@@ -91,11 +122,17 @@ const updateUser = async (req, res) => {
       return res.status(404).json({ message: "Usuario no encontrado" });
     }
 
-    // Actualizar los datos del usuario
-    user.nombre = nombre;
-    user.apellido = apellido;
-    user.correo = correo;
-    user.estado = estado;  // Puede ser 1 o 0 dependiendo si el usuario está activo o inactivo
+    // Si se recibe un campo 'nombre', actualizarlo
+    if (nombre) user.nombre = nombre;
+
+    // Si se recibe un campo 'apellido', actualizarlo
+    if (apellido) user.apellido = apellido;
+
+    // Si se recibe un campo 'correo', actualizarlo
+    if (correo) user.correo = correo;
+
+    // Si se recibe un campo 'estado', actualizarlo
+    if (estado !== undefined) user.estado = estado;
 
     // Guardar los cambios
     await user.save();
@@ -107,4 +144,78 @@ const updateUser = async (req, res) => {
   }
 };
 
-module.exports = { getAllUsuarios, getUserData, changePassword, updateUser };
+const updateUserState = async (req, res) => {
+  const { usuario } = req.params;
+  const { estado } = req.body;
+
+  if (estado === undefined) {
+    return res.status(400).json({ message: "El estado es requerido" });
+  }
+
+  try {
+    // Buscar el usuario por nombre de usuario
+    const user = await Personal.findOne({ where: { usuario } });
+
+    if (!user) {
+      return res.status(404).json({ message: "Usuario no encontrado" });
+    }
+
+    // Actualizar solo el estado del usuario
+    user.estado = estado;
+
+    // Guardar los cambios
+    await user.save();
+
+    // Retornar un mensaje de éxito
+    res.status(200).json({ message: "Estado del usuario actualizado exitosamente" });
+  } catch (err) {
+    res.status(500).json({ message: "Error al actualizar el estado del usuario", error: err.message });
+  }
+};
+
+
+
+
+const postUser = async (req, res) => {
+  const { usuario, nombre, apellido, correo, password, cargo } = req.body;
+
+  // Verificar que los campos requeridos estén presentes
+  if (!usuario || !nombre || !apellido || !correo || !password || !cargo) {
+    return res.status(400).json({ error: "Todos los campos son obligatorios." });
+  }
+
+  try {
+    // Verificar si el usuario ya está registrado
+    const existingUser = await Personal.findOne({ where: { usuario } });
+    if (existingUser) {
+      return res.status(409).json({ error: "El usuario ya está registrado." });
+    }
+
+    // Verificar si el correo ya está registrado
+    const existingEmail = await Personal.findOne({ where: { correo } });
+    if (existingEmail) {
+      return res.status(409).json({ error: "El correo ya está registrado." });
+    }
+
+    // Crear el nuevo usuario
+    const newUser = await Personal.create({
+      usuario,
+      nombre,
+      apellido,
+      correo,
+      password,
+      cargo,
+      estado: "1", // Estado por defecto
+    });
+
+    return res.status(201).json({ message: "Usuario creado exitosamente.", newUser });
+  } catch (error) {
+    console.error("Error al crear el usuario:", error);
+    return res.status(500).json({ error: "Error al crear el usuario." });
+  }
+};
+
+
+
+
+module.exports = { getAllUsuario,getAllUsuarios, getUserData, changePassword, updateUser,postUser,updateUserState };

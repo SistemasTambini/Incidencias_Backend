@@ -10,7 +10,7 @@ const login = async (req, res) => {
 
   try {
     // Buscar el usuario en la base de datos
-    const user = await Personal.findOne({ where: { usuario } });
+    const user = await Personal.findOne({ where: { usuario,estado:1 } });
 
     if (!user) {
       return res.status(404).json({ message: "Usuario no encontrado" });
