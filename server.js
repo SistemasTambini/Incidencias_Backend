@@ -2,9 +2,10 @@ const express = require("express");
 const cors = require("cors"); // Importar CORS
 require("dotenv").config(); // Cargar las variables de entorno
 const db = require("./src/config/dbConfig"); // Importar configuración de la base de datos
+
 // Importar el módulo body-parser
 const bodyParser = require('body-parser');
-
+const path = require("path");
 const app = express();
 const areaRoutes = require("./src/routes/areaRoutes");
 const incidenciaRoutes = require("./src/routes/incidenciaRoutes");
@@ -12,6 +13,10 @@ const authRoutes = require("./src/routes/authRoutes");
 const userRoutes = require("./src/routes/userRoutes")
 const reporteRoutes = require("./src/routes/reporteRoutes")
 const dashboardRoutes = require("./src/routes/dashboardRoutes")
+const categoriaRoutes = require("./src/routes/categoriaRoutes")
+const productoRoutes = require("./src/routes/productoRoutes")
+
+
 const errorHandler = require("./src/middleware/errorHandler");
 
 // Configuración del puerto
@@ -29,6 +34,9 @@ app.use("/api/auth", authRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/reporte",reporteRoutes);
 app.use("/api/dashboard",dashboardRoutes)
+app.use("/api/categoria",categoriaRoutes)
+app.use("/api/producto",productoRoutes)
+app.use(express.static(path.join(process.cwd(), "public")));
 
 // Middleware de manejo de errores
 app.use(errorHandler);

@@ -27,7 +27,8 @@ const login = async (req, res) => {
         id: user.id, 
         usuario: user.usuario, 
         nombre: user.nombre,
-        apellido: user.apellido  // Asegúrate de que el modelo Personal tenga estos campos
+        apellido: user.apellido,
+        cargo: user.cargo  // Asegúrate de que el modelo Personal tenga estos campos
       },
       process.env.JWT_SECRET,
       { expiresIn: "1h" }
