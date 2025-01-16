@@ -2,7 +2,7 @@ const fs = require("fs");
 const path = require("path");
 const Producto = require("../models/producto");
 const EtiquetaQR = require("../models/etiquetaQR");
-const { QueryTypes } = require('sequelize'); 
+const { QueryTypes } = require('sequelize');
 const sequelize = require('../config/dbConfig'); // Conexión a la base de datos
 
 // Crear un producto
@@ -19,29 +19,11 @@ const crearProducto = async (req, res) => {
   } = req.body;
 
   try {
-    let Url_image = null;
+    // Obtener la fecha en GMT-5
+    const now = new Date();
+    const fechaGMT5 = new Date(now.getTime() - 5 * 60 * 60 * 1000); // Restar 5 horas
 
-    if (req.file) {
-      const imageName = `product-${Date.now()}-${req.file.originalname}`;
-      const targetPath = path.join(
-        process.cwd(),
-        "public",
-        "assets",
-        "productos",
-        imageName
-      );
-
-      try {
-        fs.renameSync(req.file.path, targetPath);
-        Url_image = `http://192.168.1.200:3000/assets/productos/${imageName}`;
-      } catch (fsError) {
-        return res.status(500).json({
-          mensaje: "Error al guardar la imagen",
-          error: fsError.message,
-        });
-      }
-    }
-
+    // Crear el producto en la base de datos
     const producto = await Producto.create({
       Nombre,
       Descripcion,
@@ -51,13 +33,44 @@ const crearProducto = async (req, res) => {
       Numero_Serie,
       Cantidad,
       Estado,
-      Url_image,
+      Fecha_creacion: fechaGMT5, // Agregar la fecha de creación
+      Url_image: null, // Inicialmente vacío
     });
 
+    let Url_image = null;
+
+    // Procesar la imagen si está presente
+    if (req.file) {
+      const imageName = `Producto-${producto.ID_Producto}${path.extname(req.file.originalname)}`;
+      const targetPath = path.join(
+        process.cwd(),
+        "public",
+        "assets",
+        "productos",
+        imageName
+      );
+
+      try {
+        // Mover la imagen a la ubicación final
+        fs.renameSync(req.file.path, targetPath);
+        Url_image = `http://192.168.1.200:3000/assets/productos/${imageName}`;
+
+        // Actualizar la URL de la imagen en la base de datos
+        producto.Url_image = Url_image;
+        await producto.save();
+      } catch (fsError) {
+        return res.status(500).json({
+          mensaje: "Error al guardar la imagen",
+          error: fsError.message,
+        });
+      }
+    }
+
+    // Crear la etiqueta QR
     const etiquetaQR = await EtiquetaQR.create({
-      Codigo: "Código generado", // Asegúrate de generar un código único aquí
+      Codigo: `QR-${producto.ID_Producto}`,
       URL_Info_Equipo: `http://192.168.1.200:3000/api/producto/${producto.ID_Producto}`,
-      Fecha_Generacion: new Date(),
+      Fecha_Generacion: fechaGMT5,
       ID_Producto: producto.ID_Producto,
     });
 
@@ -73,6 +86,7 @@ const crearProducto = async (req, res) => {
     });
   }
 };
+
 
 
 // Obtener un producto por ID
@@ -97,7 +111,7 @@ const getProductoById = async (req, res) => {
   }
 };
 
-const MostrarListadoProducto = async (req, res) =>{
+const MostrarListadoProducto = async (req, res) => {
   try {
     // Ejecutamos el procedimiento almacenado
     const result = await sequelize.query('CALL sp_mostrar_ListadoProductos()', {
@@ -106,7 +120,7 @@ const MostrarListadoProducto = async (req, res) =>{
 
     // Si obtenemos resultados
     if (result && result.length > 0) {
-      
+
       const data = result[0]; // `result[0]` debería contener el primer conjunto de datos
 
       return res.status(200).json(data); // Devolvemos los resultados como JSON
@@ -129,21 +143,21 @@ const guardarQR = async (req, res) => {
       return res.status(400).json({ mensaje: "No se ha adjuntado ningún archivo QR." });
     }
 
-    // Generar la ruta donde se almacenará el QR
-    const qrName = `QR-${Date.now()}-${req.file.originalname}`;
-    const qrPath = path.join(process.cwd(), "public", "assets", "QR", qrName);
-
-    // Mover el archivo a la carpeta de QR
-    fs.renameSync(req.file.path, qrPath);
-
-    const qrUrl = `http://192.168.1.200:3000/assets/QR/${qrName}`;
-
     // Buscar el producto por ID
     const producto = await Producto.findOne({ where: { ID_Producto } });
 
     if (!producto) {
       return res.status(404).json({ mensaje: "Producto no encontrado." });
     }
+
+    // Generar el nombre del archivo QR con el formato QR-ID_Producto
+    const qrName = `QR-${ID_Producto}${path.extname(req.file.originalname)}`; // QR-ID_Producto.ext
+    const qrPath = path.join(process.cwd(), "public", "assets", "QR", qrName);
+
+    // Mover el archivo a la carpeta de QR
+    fs.renameSync(req.file.path, qrPath);
+
+    const qrUrl = `http://192.168.1.200:3000/assets/QR/${qrName}`;
 
     // Actualizar la columna QR_Code en la base de datos
     producto.QR_Code = qrUrl;
@@ -161,6 +175,7 @@ const guardarQR = async (req, res) => {
     });
   }
 };
+
 
 const editarProducto = async (req, res) => {
   const { ID_Producto } = req.params; // Obtener el ID del producto desde los parámetros
@@ -190,6 +205,10 @@ const editarProducto = async (req, res) => {
     producto.Numero_Serie = Numero_Serie || producto.Numero_Serie;
     producto.Cantidad = Cantidad || producto.Cantidad;
 
+    // Actualizar la fecha de modificación en GMT-5
+    const now = new Date();
+    producto.Fecha_modificacion = new Date(now.getTime() - 5 * 60 * 60 * 1000);
+
     await producto.save(); // Guardar los cambios en la base de datos
 
     res.status(200).json({
@@ -205,6 +224,7 @@ const editarProducto = async (req, res) => {
   }
 };
 
+
 const eliminarProducto = async (req, res) => {
   const { ID_Producto } = req.params; // Obtener el ID del producto desde los parámetros
 
@@ -217,6 +237,10 @@ const eliminarProducto = async (req, res) => {
 
     // Cambiar el estado a 0 (desactivado)
     producto.Estado = 0;
+
+    // Actualizar la fecha de modificación en GMT-5
+    const now = new Date();
+    producto.Fecha_modificacion = new Date(now.getTime() - 5 * 60 * 60 * 1000);
 
     await producto.save(); // Guardar los cambios en la base de datos
 
@@ -233,4 +257,5 @@ const eliminarProducto = async (req, res) => {
   }
 };
 
-module.exports = { crearProducto, getProductoById,MostrarListadoProducto,guardarQR,editarProducto,eliminarProducto};
+
+module.exports = { crearProducto, getProductoById, MostrarListadoProducto, guardarQR, editarProducto, eliminarProducto };

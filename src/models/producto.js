@@ -54,7 +54,15 @@ const Producto = sequelize.define("Producto", {
   Url_image :{
     type: DataTypes.STRING(500),
     allowNull: true,
-  }
+  },
+  Fecha_creacion: {
+    type: DataTypes.DATE,
+    defaultValue: DataTypes.NOW,
+  },
+  Fecha_modificacion: {
+    type: DataTypes.DATE,
+    defaultValue: DataTypes.NOW,
+  },
 },
 {
   freezeTableName: true,  // Desactiva el plural

@@ -15,6 +15,9 @@ const reporteRoutes = require("./src/routes/reporteRoutes")
 const dashboardRoutes = require("./src/routes/dashboardRoutes")
 const categoriaRoutes = require("./src/routes/categoriaRoutes")
 const productoRoutes = require("./src/routes/productoRoutes")
+const personalRoutes = require("./src/routes/personalRoutes")
+const asignacionRoutes = require("./src/routes/asingacionRoutes")
+const empresaRoutes = require("./src/routes/empresaRoutes")
 
 
 const errorHandler = require("./src/middleware/errorHandler");
@@ -36,6 +39,9 @@ app.use("/api/reporte",reporteRoutes);
 app.use("/api/dashboard",dashboardRoutes)
 app.use("/api/categoria",categoriaRoutes)
 app.use("/api/producto",productoRoutes)
+app.use("/api/personal",personalRoutes)
+app.use("/api/asignacion",asignacionRoutes)
+app.use("/api/empresa",empresaRoutes)
 app.use(express.static(path.join(process.cwd(), "public")));
 
 // Middleware de manejo de errores
