@@ -18,7 +18,12 @@ const productoRoutes = require("./src/routes/productoRoutes")
 const personalRoutes = require("./src/routes/personalRoutes")
 const asignacionRoutes = require("./src/routes/asingacionRoutes")
 const empresaRoutes = require("./src/routes/empresaRoutes")
-
+const siganotRoutes = require("./src/routes/reporteSiganotRoutes")
+const agendaRoutes = require("./src/routes/agendaRoutes")
+const permisoRoutes = require("./src/routes/permisosRoutes")
+const recordatorioRoutes = require('./src/routes/recordatorioRoutes'); 
+const permiso_aplicativoRoutes = require('./src/routes/permisoAplicativosRoutes')
+const correspondeciaRoutes = require('./src/routes/correspondenciaRoutes')
 
 const errorHandler = require("./src/middleware/errorHandler");
 
@@ -42,6 +47,12 @@ app.use("/api/producto",productoRoutes)
 app.use("/api/personal",personalRoutes)
 app.use("/api/asignacion",asignacionRoutes)
 app.use("/api/empresa",empresaRoutes)
+app.use("/api/siganot",siganotRoutes)
+app.use("/api/agenda",agendaRoutes)
+app.use("/api/permiso",permisoRoutes)
+app.use("/api/permiso_aplicativo",permiso_aplicativoRoutes)
+app.use("/api/correspondencia",correspondeciaRoutes)
+app.use('/api', recordatorioRoutes);
 app.use(express.static(path.join(process.cwd(), "public")));
 
 // Middleware de manejo de errores

@@ -2,6 +2,7 @@
 // module.exports = { getAllAreas };
 const Area = require("../models/area");
 const Cargo = require("../models/cargo")
+const TipoIncidencia = require ("../models/tipoIncidencia")
 
 // Obtener todas las áreas activas (estado = 1) y ordenadas por nombre de forma ascendente
 const getAllAreas = async (req, res) => {
@@ -30,4 +31,16 @@ const getAllCargos = async (req,res) =>{
   }
 }
 
-module.exports = { getAllAreas,getAllCargos };
+const getAllTiposIncidencias = async (req,res) =>{
+  try {
+    // Consulta las áreas donde el estado sea igual a 1 y ordénalas por nombre ascendente
+    const areas = await TipoIncidencia.findAll({
+      where: { estado: 1 },  // Filtra solo las áreas con estado 1
+    });
+    res.status(200).json(areas);  // Retorna las áreas activas ordenadas
+  } catch (err) {
+    res.status(500).json({ message: "Error al obtener las áreas", error: err.message });
+  }
+}
+
+module.exports = { getAllAreas,getAllCargos,getAllTiposIncidencias };
