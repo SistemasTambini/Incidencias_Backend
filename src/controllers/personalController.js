@@ -34,7 +34,7 @@ const getPersonal = async (req, res) => {
 // Función para agregar un nuevo registro
 const agregarPersonal = async (req, res) => {
   try {
-    const { nombre, apellido, genero, correo, telefono, id_area } = req.body;
+    const { nombre, apellido, genero, correo, telefono, id_area,documento } = req.body;
 
     // Validar que los campos requeridos estén presentes
     if (!nombre || !apellido) {
@@ -47,6 +47,7 @@ const agregarPersonal = async (req, res) => {
       apellido,
       genero,
       correo,
+      documento,
       telefono,
       id_area,
       Fecha_Creacion: getGMT5Date(),
@@ -65,7 +66,7 @@ const agregarPersonal = async (req, res) => {
 const editarPersonal = async (req, res) => {
   try {
     const { id } = req.params; // Obtener el ID desde los parámetros de la ruta
-    const { nombre, apellido, genero, correo, telefono, id_area} = req.body;
+    const { nombre, apellido, genero, correo, telefono, id_area,documento} = req.body;
 
     // Buscar el registro por ID
     const usuario = await Usuario.findByPk(id);
@@ -80,6 +81,7 @@ const editarPersonal = async (req, res) => {
       apellido,
       genero,
       correo,
+      documento,
       telefono,
       id_area,
       Fecha_Modificacion: getGMT5Date(),

@@ -1,4 +1,7 @@
+const { Op } = require("sequelize");
 const Correspondencia = require("../../models/correspondencia");
+const BitacoraCorrespondencia = require("../../models/bitacoraCorrespondencia");
+const listadoUsuarioJefe = require("../../models/usuario");
 const path = require("path");
 const fs = require("fs");
 
@@ -10,14 +13,19 @@ exports.getCorrespondencia = async (req, res) => {
         "id",
         "FechaRecepcion",
         "Remitente",
-        "Asunto",
+        "Observaciones",
         "Para",
         "Recepcionado",
         "EntregadoPersona",
         "FechaEntrega",
-        "imagen_url"
+        "imagen_url",
+        "Estado"
       ],
-      where: { Estado: 1 },
+      where: {
+        Estado: {
+          [Op.ne]: 0 // Excluye registros donde Estado sea 0
+        }
+      },
       order: [["id", "DESC"]],
     });
     res.json(correspondencias);
@@ -29,11 +37,11 @@ exports.getCorrespondencia = async (req, res) => {
 // POST: Registrar nueva correspondencia
 exports.postRegistro = async (req, res) => {
   try {
-    const { FechaRecepcion, Remitente, Asunto, Para, Recepcionado, EntregadoPersona } = req.body;
+    const { FechaRecepcion, Remitente, Observaciones, Para, Recepcionado, EntregadoPersona } = req.body;
     let imagen_url = null;
 
     // Validar que los campos obligatorios estén presentes
-    if (!FechaRecepcion || !Remitente || !Asunto || !Para || !Recepcionado) {
+    if (!FechaRecepcion || !Remitente  || !Para || !Recepcionado) {
       return res.status(400).json({ error: "Todos los campos son requeridos" });
     }
 
@@ -59,7 +67,7 @@ exports.postRegistro = async (req, res) => {
     const nuevaCorrespondencia = await Correspondencia.create({
       FechaRecepcion,
       Remitente,
-      Asunto,
+      Observaciones,
       Para,
       Recepcionado,
       EntregadoPersona: EntregadoPersona || "", // Enviar cadena vacía si no se proporciona
@@ -78,13 +86,14 @@ exports.postRegistro = async (req, res) => {
 // POST: Actualizar entrega
 exports.updateEntrega = async (req, res) => {
   try {
-    const { id, EntregadoPersona, FechaEntrega } = req.body;
+    const { id, EntregadoPersona, FechaEntrega} = req.body;
     const correspondencia = await Correspondencia.findByPk(id);
     if (!correspondencia) {
       return res.status(404).json({ error: "Correspondencia no encontrada" });
     }
     correspondencia.EntregadoPersona = EntregadoPersona;
     correspondencia.FechaEntrega = FechaEntrega;
+    correspondencia.Estado = 2;
     await correspondencia.save();
     res.json({ message: "Entrega actualizada correctamente" });
   } catch (error) {
@@ -92,10 +101,11 @@ exports.updateEntrega = async (req, res) => {
   }
 };
 
+
 // PUT: Actualizar correspondencia
 exports.updateCorrespondencia = async (req, res) => {
   try {
-    const { id, Remitente, Asunto, Para, Recepcionado, EntregadoPersona } = req.body;
+    const { id, Remitente, Observaciones, Para, Recepcionado, EntregadoPersona } = req.body;
 
     // Buscar correspondencia por ID
     const correspondencia = await Correspondencia.findByPk(id);
@@ -103,10 +113,16 @@ exports.updateCorrespondencia = async (req, res) => {
       return res.status(404).json({ error: "Correspondencia no encontrada" });
     }
 
+    let estadoActualizado = false;
+
     // Actualizar solo los campos enviados en la petición
     if (Remitente) correspondencia.Remitente = Remitente;
-    if (Asunto) correspondencia.Asunto = Asunto;
-    if (Para) correspondencia.Para = Para;
+    if (Observaciones) correspondencia.Observaciones = Observaciones;
+    if (Para && correspondencia.Para !== Para) {
+      correspondencia.Para = Para;
+      correspondencia.Estado = 3; // Solo actualizar estado si "Para" cambió
+      estadoActualizado = true;
+    }
     if (Recepcionado) correspondencia.Recepcionado = Recepcionado;
     if (EntregadoPersona) correspondencia.EntregadoPersona = EntregadoPersona;
 
@@ -136,8 +152,10 @@ exports.updateCorrespondencia = async (req, res) => {
       }
     }
 
-    // Guardar los cambios en la base de datos
-    await correspondencia.save();
+    // Guardar los cambios en la base de datos solo si hubo cambios
+    if (Remitente || Observaciones || Para || Recepcionado || EntregadoPersona || req.file || estadoActualizado) {
+      await correspondencia.save();
+    }
 
     res.json({ message: "Correspondencia actualizada correctamente", correspondencia });
   } catch (error) {
@@ -145,3 +163,76 @@ exports.updateCorrespondencia = async (req, res) => {
     res.status(500).json({ error: "Error al actualizar la correspondencia", details: error.message });
   }
 };
+
+
+
+// POST: Actualizar Finalizado
+exports.updateFinalizado = async (req, res) => {
+  try {
+    const { id} = req.body;
+    const correspondencia = await Correspondencia.findByPk(id);
+    if (!correspondencia) {
+      return res.status(404).json({ error: "Correspondencia no encontrada" });
+    }
+    correspondencia.Estado = 4;
+    await correspondencia.save();
+    res.json({ message: "Entrega Finalizada Correctamente" });
+  } catch (error) {
+    res.status(500).json({ error: "Error al actualizar la entrega" });
+  }
+};
+
+
+// GET: Obtener bitácora por correspondencia_id
+exports.getBitacoraRegistroCorrespondencia = async (req, res) => {
+  try {
+    const { correspondencia_id } = req.query; // Obtener el ID de la consulta
+
+    if (!correspondencia_id) {
+      return res.status(400).json({ error: "El parámetro correspondencia_id es requerido" });
+    }
+
+    const bitacora_correspondencia = await BitacoraCorrespondencia.findAll({
+      attributes: [
+        "id",
+        "Remitente",
+        "Para",
+        "EntregadoPersona",
+        "Observaciones",
+        "Estado",
+        "Fecha_Modificada",
+    
+      ],
+      where: { correspondencia_id },
+    });
+
+    res.json(bitacora_correspondencia);
+  } catch (error) {
+    res.status(500).json({ error: "Error al obtener bitacora_correspondencia", details: error.message });
+  }
+};
+
+// GET: Obtener usuario estado 1 y cargo jefe 1
+exports.getListarUsuarioJefe = async (req, res) => {
+  try {
+    const usuarios = await listadoUsuarioJefe.findAll({
+      attributes: ["id", "nombre", "apellido", "documento", "telefono"],
+      where: {
+        Estado: 1,
+        Jefe: 1,
+      },
+    });
+
+    res.json(usuarios);
+  } catch (error) {
+    res.status(500).json({ error: "Error al obtener usuario", details: error.message });
+  }
+};
+
+
+
+
+
+
+
+

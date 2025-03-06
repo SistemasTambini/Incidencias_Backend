@@ -15,10 +15,10 @@ const Correspondencia = sequelize.define("correspondencia", {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  Asunto: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
+  // Asunto: {
+  //   type: DataTypes.STRING,
+  //   allowNull: false,
+  // },
   Para: {
     type: DataTypes.STRING,
     allowNull: false,
@@ -28,6 +28,10 @@ const Correspondencia = sequelize.define("correspondencia", {
     allowNull: false,
   },
   EntregadoPersona: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  Observaciones: {
     type: DataTypes.STRING,
     allowNull: false,
   },
@@ -49,6 +53,7 @@ const Correspondencia = sequelize.define("correspondencia", {
     allowNull: false,
     defaultValue: DataTypes.NOW,
   },
+  
 }, {
   tableName: "correspondencia",
   timestamps: false,

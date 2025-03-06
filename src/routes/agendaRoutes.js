@@ -1,13 +1,14 @@
 const express = require("express");
-const { crearCita, obtenerCitas,actualizarEstadoCita,RecordatorioAtu,RecordatorioExtraProcolar } = require("../controllers/agendaController");
+const { crearCita,obtenerCitasFirmas, obtenerCitas,actualizarEstadoCita,RecordatorioAtu,RecordatorioExtraProcolar } = require("../controllers/agendaController");
 
 const router = express.Router();
 
 // Rutas para las citas
 router.post("/", crearCita); // Ruta para crear una cita
-router.post("/Atu", RecordatorioAtu); 
-router.post("/Ext", RecordatorioExtraProcolar); 
+router.post("/testamento", RecordatorioAtu); 
+router.post("/legalizacion", RecordatorioExtraProcolar); 
 router.get("/", obtenerCitas); // Ruta para obtener todas las citas
+router.get("/firma", obtenerCitasFirmas); // Ruta para obtener todas las citas para firmas
 
 // Ruta para actualizar el estado de una cita
 router.put("/:id", actualizarEstadoCita);

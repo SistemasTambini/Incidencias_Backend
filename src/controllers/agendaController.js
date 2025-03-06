@@ -4,19 +4,22 @@ const { getGMT5Date } = require('../utils/dateUtils');
 
 // Crear una nueva cita test
 const crearCita = async (req, res) => {
-    const { nombre, apellido, dni, telefono, estado, area, fecha_registro } = req.body;
+    const { nombre, apellido = "N/A", dni="N/A", telefono, estado, area=1, constancia_pago,fecha_registro } = req.body;
 
     // Validación básica
-    if (!nombre || !apellido || !dni || !telefono || !area || !fecha_registro) {
-        return res.status(400).json({ error: "Todos los campos son obligatorios." });
+    // Validación de campos requeridos
+    if (!nombre) {
+        return res.status(400).json({ error: "El nombre es obligatorio." });
+    }
+    if (!telefono) {
+        return res.status(400).json({ error: "El teléfono es obligatorio." });
+    }
+    if (!constancia_pago) {
+        return res.status(400).json({ error: "La constancia de pago es obligatoria." });
     }
 
     try {
-        // Verificar si el área existe
-        const areaExistente = await Area.findOne({ where: { id: area } });
-        if (!areaExistente) {
-            return res.status(404).json({ error: "El área especificada no existe." });
-        }
+        
 
         // Convertir la fecha a GMT-5 si no se proporciona
         const fechaRegistroFinal = fecha_registro ? new Date(fecha_registro) : getGMT5Date();
@@ -28,8 +31,8 @@ const crearCita = async (req, res) => {
             dni,
             telefono,
             area,
-            estado: estado || 0, // Si no se pasa un estado, usar 0 por defecto
             fecha_registro: fechaRegistroFinal,
+            constancia_pago,
             tipo: 'TOMA_DE_FIRMA' // Usar la fecha convertida
         });
 
@@ -44,10 +47,10 @@ const crearCita = async (req, res) => {
 };
 
 const RecordatorioAtu = async (req, res) => {
-    const { nombre, apellido = "N/A", dni, telefono, estado, area = 1 ,constancia_pago= "N/A"} = req.body;
+    const { nombre, apellido = "N/A", dni = "N/A", telefono, estado, area = 1, constancia_pago } = req.body;
 
     // Validación básica
-    if (!nombre || !dni || !telefono) {
+    if (!nombre || !constancia_pago || !telefono) {
         return res.status(400).json({ error: "Todos los campos son obligatorios." });
     }
 
@@ -59,9 +62,9 @@ const RecordatorioAtu = async (req, res) => {
             dni,
             telefono,
             area, // Usamos el área recibida o 1 por defecto
-            estado: estado || 0,
-            tipo: "ATU",
-            constancia_pago
+            estado: 0,
+            tipo: "TESTAMENTO",
+            constancia_pago,
             // Si no se pasa un estado, usar 0 por defecto
         });
 
@@ -92,13 +95,13 @@ const RecordatorioExtraProcolar = async (req, res) => {
             telefono,
             area, // Usamos el área recibida o 1 por defecto
             estado: 0,
-            tipo: "EXTRAPROTOCOLAR",
+            tipo: "LEGALIZACIONES",
             constancia_pago,
             // Si no se pasa un estado, usar 0 por defecto
         });
 
         res.status(201).json({
-            message: "Recordatorio Extraprotocolar creado correctamente.",
+            message: "Recordatorio LEGALIZACIONES creado correctamente.",
             cita: nuevaCita,
         });
     } catch (error) {
@@ -107,8 +110,6 @@ const RecordatorioExtraProcolar = async (req, res) => {
     }
 }
 
-
-// Obtener todas las citas
 const obtenerCitas = async (req, res) => {
     try {
         const citas = await AgendaBot.findAll({
@@ -121,6 +122,26 @@ const obtenerCitas = async (req, res) => {
         res.status(500).json({ error: "Error al obtener las citas." });
     }
 };
+// Obtener todas las citas
+// Obtener todas las citas de TOMA_DE_FIRMA con estado activo (1)
+const obtenerCitasFirmas = async (req, res) => {
+    try {
+        const citas = await AgendaBot.findAll({
+            where: {
+                tipo: "TOMA_DE_FIRMA",
+                estado: 1
+            },
+            attributes: ["id","nombre", "telefono", "fecha_registro"], // Solo traer los campos necesarios
+            
+        });
+
+        res.status(200).json(citas);
+    } catch (error) {
+        console.error("Error al obtener las citas:", error);
+        res.status(500).json({ error: "Error al obtener las citas." });
+    }
+};
+
 
 // Actualizar el estado de una cita
 const actualizarEstadoCita = async (req, res) => {
@@ -146,7 +167,7 @@ const actualizarEstadoCita = async (req, res) => {
 
 
 
-module.exports = { crearCita, obtenerCitas, actualizarEstadoCita, RecordatorioAtu, RecordatorioExtraProcolar };
+module.exports = { crearCita, obtenerCitas,obtenerCitasFirmas, actualizarEstadoCita, RecordatorioAtu, RecordatorioExtraProcolar };
 
 
 

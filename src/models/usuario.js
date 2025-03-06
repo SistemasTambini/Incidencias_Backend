@@ -26,6 +26,11 @@ const Usuario = sequelize.define('Usuario', {
         allowNull: false,
         unique: true
     },
+    documento: {
+        type: DataTypes.STRING(100),
+        allowNull: false,
+        unique: true
+    },
     telefono: {
         type: DataTypes.STRING(15),
         allowNull: true
@@ -49,6 +54,10 @@ const Usuario = sequelize.define('Usuario', {
         defaultValue: DataTypes.NOW
     },
     Estado: {
+        type: DataTypes.INTEGER,
+        defaultValue: true // 1: Activo, 0: Inactivo
+    },
+    Jefe: {
         type: DataTypes.INTEGER,
         defaultValue: true // 1: Activo, 0: Inactivo
     }
