@@ -1,6 +1,7 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/dbConfig"); // Importa la instancia de Sequelize
 
+
 const Correspondencia = sequelize.define("correspondencia", {
   id: {
     type: DataTypes.INTEGER,
@@ -15,11 +16,11 @@ const Correspondencia = sequelize.define("correspondencia", {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  // Asunto: {
-  //   type: DataTypes.STRING,
-  //   allowNull: false,
-  // },
   Para: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  telefono: {
     type: DataTypes.STRING,
     allowNull: false,
   },
@@ -48,6 +49,11 @@ const Correspondencia = sequelize.define("correspondencia", {
     allowNull: false,
     defaultValue: 0,
   },
+  Estado_envio_wp: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    defaultValue: 0,
+  },
   updated_at: {
     type: DataTypes.DATE,
     allowNull: false,
@@ -58,5 +64,7 @@ const Correspondencia = sequelize.define("correspondencia", {
   tableName: "correspondencia",
   timestamps: false,
 });
+
+
 
 module.exports = Correspondencia;

@@ -24,6 +24,8 @@ const permisoRoutes = require("./src/routes/permisosRoutes")
 const recordatorioRoutes = require('./src/routes/recordatorioRoutes'); 
 const permiso_aplicativoRoutes = require('./src/routes/permisoAplicativosRoutes')
 const correspondeciaRoutes = require('./src/routes/correspondenciaRoutes')
+const calificacionRoutes = require("./src/routes/calificacionRoutes")
+const permisoViajeRoutes = require("./src/routes/permisoViajeRoutes")
 
 const errorHandler = require("./src/middleware/errorHandler");
 
@@ -52,6 +54,8 @@ app.use("/api/agenda",agendaRoutes)
 app.use("/api/permiso",permisoRoutes)
 app.use("/api/permiso_aplicativo",permiso_aplicativoRoutes)
 app.use("/api/correspondencia",correspondeciaRoutes)
+app.use("/api/calificacion",calificacionRoutes)
+app.use("/api/permiso_viaje",permisoViajeRoutes)
 app.use('/api', recordatorioRoutes);
 app.use(express.static(path.join(process.cwd(), "public")));
 
