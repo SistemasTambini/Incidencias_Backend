@@ -26,6 +26,8 @@ const permiso_aplicativoRoutes = require('./src/routes/permisoAplicativosRoutes'
 const correspondeciaRoutes = require('./src/routes/correspondenciaRoutes')
 const calificacionRoutes = require("./src/routes/calificacionRoutes")
 const permisoViajeRoutes = require("./src/routes/permisoViajeRoutes")
+const registroLLamadas = require("./src/routes/registroLLamadasRoutes")
+
 
 const errorHandler = require("./src/middleware/errorHandler");
 
@@ -36,6 +38,7 @@ const PORT = process.env.PORT || 3000;
 // Habilitar CORS
 app.use(cors());
 app.use(bodyParser.json()); // Soporte para JSON en las solicitudes
+
 
 // Rutas
 app.use("/api/areas", areaRoutes);
@@ -56,6 +59,7 @@ app.use("/api/permiso_aplicativo",permiso_aplicativoRoutes)
 app.use("/api/correspondencia",correspondeciaRoutes)
 app.use("/api/calificacion",calificacionRoutes)
 app.use("/api/permiso_viaje",permisoViajeRoutes)
+app.use("/api/registroLLamadas",registroLLamadas)
 app.use('/api', recordatorioRoutes);
 app.use(express.static(path.join(process.cwd(), "public")));
 
