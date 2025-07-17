@@ -44,6 +44,7 @@ const getAllUsuario = async (req, res) => {
       usuario: p.usuario,
       nombre: p.nombre,
       apellido: p.apellido,
+      documento: p.documento,
       correo: p.correo,      
       cargo: p.Cargo?.nombre || null, // Reemplaza cargo:1 por el nombre del cargo
       estado: p.estado,

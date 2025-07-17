@@ -176,7 +176,7 @@ const obtenerPersonalxArea = async (req, res) => {
 const UpdateRegistroLlamadas = async (req, res) => {
   try {
     const { id } = req.params; 
-    const { area, asesor, tipo, contacto } = req.body;
+    const { area, asesor, tipo, contacto, motivo } = req.body;
 
     const registro_llamadas = await RegistroLlamadas.findByPk(id);
     if (!registro_llamadas) {
@@ -187,6 +187,7 @@ const UpdateRegistroLlamadas = async (req, res) => {
     registro_llamadas.asesor = asesor;
     registro_llamadas.tipo = tipo;
     registro_llamadas.contacto = contacto;
+    registro_llamadas.motivo = motivo;
 
     await registro_llamadas.save();
 
