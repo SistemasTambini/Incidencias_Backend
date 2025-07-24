@@ -8,8 +8,16 @@ const {
   updateEstadoEnvioWsp,
   cambioEstado,
   // obtenerRegistrosXusuario,
-  getReporteLLamadas // ✅ importar el nuevo controller
+  getReporteLLamadas
+ 
 } = require("../controllers/registroLLamadasController");
+
+const {
+  getRegistroxUsuario,
+  getRegLlamadaxAreaEstado,
+  getRegistroPorcentajexArea,
+  getRegLlamadaxTipoxAsesor
+}= require("../controllers/dashboardRegLlamadaController");
 
 // POST: Crear un nuevo registro
 router.post("/", crearRegistro);
@@ -34,5 +42,11 @@ router.post("/uptEstadoEnvioWsp", updateEstadoEnvioWsp);
 
 // ✅ GET: Obtener reporte de llamadas por fecha
 router.get("/reporte", getReporteLLamadas);
+
+// 📊 Dashboard
+router.get("/dashboard/registrosxusu/", getRegistroxUsuario);
+router.get("/dashboard/registros/", getRegLlamadaxAreaEstado);
+router.get("/dashboard/regis_pend_porc/", getRegistroPorcentajexArea);
+router.get("/dashboard/regis_pend_tipo_asesor/", getRegLlamadaxTipoxAsesor);
 
 module.exports = router;

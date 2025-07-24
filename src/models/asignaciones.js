@@ -36,6 +36,10 @@ const Asignaciones = sequelize.define('Asignaciones', {
         defaultValue: 1,
         allowNull: false
     },
+    Numero_Serie: {
+    type: DataTypes.STRING(100),
+    allowNull: false,
+    },
     fecha_asignacion: {
         type: DataTypes.DATE,
         defaultValue: DataTypes.NOW

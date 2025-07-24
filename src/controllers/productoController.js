@@ -13,7 +13,9 @@ const crearProducto = async (req, res) => {
     ID_Categoria,
     Marca,
     Modelo,
-    Numero_Serie,
+    // Numero_Serie,
+    Tipo,
+    Valor_Activo,
     Cantidad,
     Estado,
   } = req.body;
@@ -30,8 +32,10 @@ const crearProducto = async (req, res) => {
       ID_Categoria,
       Marca,
       Modelo,
-      Numero_Serie,
+      // Numero_Serie,
       Cantidad,
+      Tipo,
+      Valor_Activo,
       Estado,
       Fecha_creacion: fechaGMT5, // Agregar la fecha de creación
       Url_image: null, // Inicialmente vacío
@@ -187,6 +191,8 @@ const editarProducto = async (req, res) => {
     Modelo,
     Numero_Serie,
     Cantidad,
+    Tipo,
+    Valor_Activo,
   } = req.body; // Datos enviados en el cuerpo de la solicitud
 
   try {
@@ -204,6 +210,8 @@ const editarProducto = async (req, res) => {
     producto.Modelo = Modelo || producto.Modelo;
     producto.Numero_Serie = Numero_Serie || producto.Numero_Serie;
     producto.Cantidad = Cantidad || producto.Cantidad;
+    producto.Tipo= Tipo || producto.Tipo;
+    producto.Valor_Activo=Valor_Activo || producto.Valor_Activo;
 
     // Actualizar la fecha de modificación en GMT-5
     const now = new Date();

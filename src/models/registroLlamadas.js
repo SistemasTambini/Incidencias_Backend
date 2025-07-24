@@ -41,6 +41,10 @@ const RegistroLlamadas = sequelize.define("RegistroLlamadas", {
     allowNull: true,
     comment: "Teléfono o correo",
   },
+  motivo: {
+    type: DataTypes.STRING(255),
+    allowNull: true,
+  },
   estado: {
     type: DataTypes.INTEGER,
     allowNull: true,

@@ -34,13 +34,25 @@ const Producto = sequelize.define("Producto", {
     type: DataTypes.STRING(100),
     allowNull: false,
   },
-  Numero_Serie: {
-    type: DataTypes.STRING(100),
-    allowNull: false,
+  // Numero_Serie: {
+  //   type: DataTypes.STRING(100),
+  //   allowNull: false,
+  // },
+  Stock_Asignado: {
+    type: DataTypes.INTEGER,
+    allowNull: true
   },
   Cantidad: {
     type: DataTypes.INTEGER,
     defaultValue: 1,
+  },
+  Tipo: {
+  type: DataTypes.STRING(100),
+   allowNull: false,
+  },
+    Valor_Activo: {
+    type: DataTypes.STRING(100),
+   allowNull: false,
   },
   QR_Code: {
     type: DataTypes.TEXT,

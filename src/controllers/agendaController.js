@@ -1,6 +1,12 @@
+// const { QueryTypes } = require('sequelize'); 
 const Area = require("../models/area");
 const AgendaBot = require("../models/agenda");
 const { getGMT5Date } = require('../utils/dateUtils');
+// const db = require('../models'); 
+// const sequelize = db.sequelize;
+const sequelize = require('../config/dbConfig'); 
+const { QueryTypes } = require('sequelize'); 
+const XLSX = require("xlsx");
 
 // Crear una nueva cita test
 const crearCita = async (req, res) => {
@@ -46,6 +52,70 @@ const crearCita = async (req, res) => {
     }
 };
 
+
+const cargarArchivoMasivo = async (req, res) => {
+    try {
+      const file = req.file;
+  
+      if (!file) {
+        return res.status(400).json({ message: "No se subió ningún archivo." });
+      }
+  
+      const workbook = XLSX.read(file.buffer, { type: "buffer" });
+      const hoja = workbook.Sheets[workbook.SheetNames[0]];
+      const data = XLSX.utils.sheet_to_json(hoja);
+  
+      const citasCreadas = [];
+
+       // función interna para obtener hora Lima
+    const getGMT5Date = () => {
+        const now = new Date();
+        const limaOffsetInMs = -5 * 60 * 60 * 1000;
+        return new Date(now.getTime() + limaOffsetInMs);
+      };
+  
+  
+      for (const row of data) {
+        const {
+          nombre,
+          apellido = "N/A",
+          dni = "N/A",
+          telefono,
+          constancia_pago,
+          tipo,
+          area = 1,
+        } = row;
+  
+       
+        if (!nombre || !telefono || !constancia_pago) continue;
+  
+        const nuevaCita = await AgendaBot.create({
+          nombre,
+          apellido,
+          dni,
+          telefono,
+          area,
+        //   fecha_registro: new Date(), //
+        fecha_registro: getGMT5Date(),
+          constancia_pago,
+          tipo,
+          estado: 0
+        });
+  
+        citasCreadas.push(nuevaCita);
+      }
+  
+      return res.status(200).json({
+        message: `✅ Se cargaron ${citasCreadas.length} citas correctamente.`,
+        citas: citasCreadas,
+      });
+    } catch (error) {
+      console.error("❌ Error en cargarArchivoMasivo:", error);
+      return res.status(500).json({ message: "Error al procesar el archivo." });
+    }
+  };
+  
+  
 const RecordatorioAtu = async (req, res) => {
     const { nombre, apellido = "N/A", dni = "N/A", telefono, estado, area = 1, constancia_pago } = req.body;
 
@@ -166,8 +236,35 @@ const actualizarEstadoCita = async (req, res) => {
 };
 
 
+const getReporteAgendaBot = async (req, res) => {
+    try {
+      const { fecha_inicio, fecha_fin } = req.query;
+  
+      if (!fecha_inicio || !fecha_fin) {
+        return res.status(400).json({ message: 'Faltan parámetros requeridos.' });
+      }
+  
+      const result = await sequelize.query(
+        'CALL sp_agendabot_reporte(:fecha_inicio, :fecha_fin)',
+        {
+          replacements: { fecha_inicio, fecha_fin },
+          type: QueryTypes.RAW,
+        }
+      );
+  
+      return res.status(200).json(result);
+    } catch (error) {
+      console.error("❌ Error real del SP:", error); // <-- AGREGADO
+      return res.status(500).json({ 
+        message: 'Error al ejecutar el procedimiento almacenado.',
+        error: error.message // <-- AGREGADO PARA VER EL DETALLE
+      });
+    }
+  };
+  
 
-module.exports = { crearCita, obtenerCitas,obtenerCitasFirmas, actualizarEstadoCita, RecordatorioAtu, RecordatorioExtraProcolar };
+
+module.exports = { crearCita, obtenerCitas,obtenerCitasFirmas, actualizarEstadoCita, RecordatorioAtu, RecordatorioExtraProcolar ,getReporteAgendaBot,cargarArchivoMasivo};
 
 
 

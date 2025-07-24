@@ -22,6 +22,10 @@ const Personal = sequelize.define(
       type: DataTypes.STRING(100),
       allowNull: false,
     },
+    documento: {
+      type: DataTypes.STRING(8),
+      allowNull: false,
+    },
     correo: {
       type: DataTypes.STRING(100),
       allowNull: false,
