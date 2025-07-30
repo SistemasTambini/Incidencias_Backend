@@ -1,4 +1,4 @@
-const sequelize = require('../config/dbConfig');
+const { sequelize } = require("../config/dbConfig");
 
 const getListarUsuarioRecordatorio = async (req, res) => {
   const { tipo_recorda } = req.query;

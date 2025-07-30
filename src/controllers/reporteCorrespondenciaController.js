@@ -1,4 +1,4 @@
-const sequelize = require('../config/dbConfig');
+const { sequelize } = require("../config/dbConfig");
 
 // Controlador para obtener el reporte de correspondencias
 const getReporteCorrespondencia = async (req, res) => {

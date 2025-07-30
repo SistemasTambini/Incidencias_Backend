@@ -1,4 +1,4 @@
-const sequelize = require('../config/dbConfig');
+const { sequelize } = require("../config/dbConfig");
 
 // Controlador para obtener el reporte de incidencias
 const getReporteIncidencias = async (req, res) => {
