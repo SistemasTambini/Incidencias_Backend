@@ -1,7 +1,7 @@
 // models/producto.js
 
 const { DataTypes } = require("sequelize");
-const sequelize = require("../config/dbConfig"); // Asegúrate de que la ruta sea correcta
+const { sequelize } = require("../config/dbConfig");  // Asegúrate de que la ruta sea correcta
 const Categoria = require("./categoria"); // Relación con el modelo Categoria
 
 const Producto = sequelize.define("Producto", {

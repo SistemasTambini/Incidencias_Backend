@@ -1,6 +1,6 @@
 // Importar Sequelize y la instancia de la conexión
 const { DataTypes } = require('sequelize');
-const sequelize = require("../config/dbConfig");
+const { sequelize } = require("../config/dbConfig"); 
 const Usuario = require("../models/usuario")
 const Producto = require("../models/producto")
 

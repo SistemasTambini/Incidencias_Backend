@@ -1,5 +1,5 @@
 const { DataTypes } = require('sequelize');
-const sequelize = require('../config/dbConfig'); // Aquí debes poner la configuración de tu conexión a la base de datos
+const { sequelize } = require("../config/dbConfig");  // Aquí debes poner la configuración de tu conexión a la base de datos
 
 const PermisoViaje = sequelize.define('PermisoViaje', {
   codigo: {

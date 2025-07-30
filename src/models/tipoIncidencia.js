@@ -1,5 +1,5 @@
 const { DataTypes } = require("sequelize");
-const sequelize = require("../config/dbConfig"); // Importa la instancia de Sequelize
+const { sequelize } = require("../config/dbConfig");  // Importa la instancia de Sequelize
 
 const TipoIncidencia = sequelize.define("tipo_incidencia", {
   id: {

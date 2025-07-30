@@ -1,7 +1,7 @@
 // models/etiquetaQR.js
 
 const { DataTypes } = require("sequelize");
-const sequelize = require("../config/dbConfig"); // Asegúrate de que la ruta sea correcta
+const { sequelize } = require("../config/dbConfig");  // Asegúrate de que la ruta sea correcta
 const Producto = require("./producto"); // Relación con el modelo Producto
 
 const EtiquetaQR = sequelize.define("EtiquetaQR", {

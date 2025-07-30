@@ -1,7 +1,7 @@
 // models/CargoPermiso.js
 
 const { DataTypes } = require("sequelize");
-const sequelize = require("../config/dbConfig");
+const { sequelize } = require("../config/dbConfig"); 
 const Cargo = require("../models/cargo");
 const Permiso = require("./Permiso");
 

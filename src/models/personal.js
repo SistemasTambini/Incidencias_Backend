@@ -1,5 +1,5 @@
 const { DataTypes } = require("sequelize");
-const sequelize = require("../config/dbConfig");
+const { sequelize } = require("../config/dbConfig"); 
 const Cargo = require("../models/cargo"); // Importa el modelo Cargo
 
 const Personal = sequelize.define(

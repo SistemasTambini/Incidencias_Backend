@@ -1,5 +1,5 @@
 const { DataTypes } = require('sequelize');
-const sequelize = require("../config/dbConfig")
+const { sequelize } = require("../config/dbConfig"); 
 const Area = require('../models/area'); // Importa el modelo `Area`
 
 const AgendaBot = sequelize.define('agendaBot', {

@@ -1,5 +1,5 @@
 const { DataTypes } = require("sequelize");
-const sequelize = require("../config/dbConfig");
+const { sequelize } = require("../config/dbConfig"); 
 
 const Permiso = sequelize.define('permisos', {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
