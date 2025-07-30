@@ -1,5 +1,5 @@
 const Empresa = require('../models/empresa'); // Modelo Empresa
-const sequelize = require('../config/dbConfig');
+const {sequelize} = require('../config/dbConfig');
 const { QueryTypes } = require('sequelize');
 const { getGMT5Date } = require('../utils/dateUtils');
 

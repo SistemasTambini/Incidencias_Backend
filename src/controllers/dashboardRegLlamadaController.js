@@ -1,5 +1,5 @@
 
-const sequelize = require('../config/dbConfig'); 
+const { sequelize } = require("../config/dbConfig"); 
 const { QueryTypes } = require('sequelize'); 
 
 //combo x area

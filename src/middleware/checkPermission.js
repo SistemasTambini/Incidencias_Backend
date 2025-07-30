@@ -1,4 +1,4 @@
-const sequelize = require("../config/dbConfig");
+const { sequelize } = require("../config/dbConfig"); 
 
 // Middleware para verificar permisos
 const checkPermission = (permisoRequerido) => {

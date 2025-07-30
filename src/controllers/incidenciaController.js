@@ -1,4 +1,4 @@
-const sequelize = require("../config/dbConfig");
+const { sequelize } = require("../config/dbConfig"); 
 const Incidencia = require("../models/incidencia");
 
 // Obtener todas las incidencias con el procedimiento almacenado

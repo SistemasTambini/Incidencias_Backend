@@ -1,5 +1,5 @@
 // /controllers/dashboardController.js
-const sequelize = require('../config/dbConfig'); // Conexión a la base de datos
+const { sequelize } = require("../config/dbConfig"); // Conexión a la base de datos
 const { QueryTypes } = require('sequelize');
 const Asignaciones = require("../models/asignaciones");
 const Producto = require("../models/producto"); // Importamos el modelo Producto

@@ -1,10 +1,7 @@
-// const { QueryTypes } = require('sequelize'); 
 const Area = require("../models/area");
 const AgendaBot = require("../models/agenda");
 const { getGMT5Date } = require('../utils/dateUtils');
-// const db = require('../models'); 
-// const sequelize = db.sequelize;
-const sequelize = require('../config/dbConfig'); 
+const { sequelize } = require("../config/dbConfig");
 const { QueryTypes } = require('sequelize'); 
 const XLSX = require("xlsx");
 
@@ -51,7 +48,6 @@ const crearCita = async (req, res) => {
         res.status(500).json({ error: "Error al guardar la cita." });
     }
 };
-
 
 const cargarArchivoMasivo = async (req, res) => {
     try {
@@ -113,8 +109,7 @@ const cargarArchivoMasivo = async (req, res) => {
       console.error("❌ Error en cargarArchivoMasivo:", error);
       return res.status(500).json({ message: "Error al procesar el archivo." });
     }
-  };
-  
+};  
   
 const RecordatorioAtu = async (req, res) => {
     const { nombre, apellido = "N/A", dni = "N/A", telefono, estado, area = 1, constancia_pago } = req.body;
@@ -212,7 +207,6 @@ const obtenerCitasFirmas = async (req, res) => {
     }
 };
 
-
 // Actualizar el estado de una cita
 const actualizarEstadoCita = async (req, res) => {
     const { id } = req.params;
@@ -234,7 +228,6 @@ const actualizarEstadoCita = async (req, res) => {
         res.status(500).json({ error: "Error al actualizar el estado de la cita." });
     }
 };
-
 
 const getReporteAgendaBot = async (req, res) => {
     try {

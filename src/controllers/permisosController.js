@@ -1,4 +1,4 @@
-const sequelize = require("../config/dbConfig"); // Conexión a la base de datos
+const { sequelize } = require("../config/dbConfig");  // Conexión a la base de datos
 
 // Obtener permisos usando el Stored Procedure
 const getUserPermissions = async (req, res) => {

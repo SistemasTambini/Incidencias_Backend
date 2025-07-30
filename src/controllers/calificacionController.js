@@ -1,4 +1,4 @@
-const sequelize = require('../config/dbConfig'); // Conexión a la base de datos
+const { sequelize } = require("../config/dbConfig"); // Conexión a la base de datos
 const { QueryTypes } = require('sequelize'); // Importamos QueryTypes de Sequelize para consultas SQL crudas
 
 

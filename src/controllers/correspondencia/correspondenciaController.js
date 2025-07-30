@@ -1,5 +1,5 @@
 const { Op } = require("sequelize");
-const sequelize = require("../../config/dbConfig");
+//const { sequelize } = require("../config/dbConfig");
 const Correspondencia = require("../../models/correspondencia");
 const BitacoraCorrespondencia = require("../../models/bitacoraCorrespondencia");
 const listadoUsuarioJefe = require("../../models/usuario");
@@ -57,7 +57,7 @@ exports.postRegistro = async (req, res) => {
       try {
         // Mover el archivo a la ubicación final
         fs.renameSync(req.file.path, targetPath);
-        imagen_url = `http://192.168.1.200:3000/assets/correspondencia/${fileName}`;
+        imagen_url = `http://192.168.1.20:3000/assets/correspondencia/${fileName}`;
       } catch (fsError) {
         return res.status(500).json({
           error: "Error al guardar el archivo",
@@ -156,7 +156,7 @@ exports.updateCorrespondencia = async (req, res) => {
 
       try {
         fs.renameSync(req.file.path, targetPath);
-        correspondencia.imagen_url = `http://192.168.1.200:3000/assets/correspondencia/${fileName}`;
+        correspondencia.imagen_url = `http://192.168.1.20:3000/assets/correspondencia/${fileName}`;
       } catch (fsError) {
         return res.status(500).json({
           error: "Error al guardar el archivo",

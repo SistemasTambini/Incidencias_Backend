@@ -1,6 +1,7 @@
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 const Personal = require("../models/personal");
 const Cargo = require("../models/cargo");
-const jwt = require("jsonwebtoken");
 
 const login = async (req, res) => {
   const { usuario, password } = req.body;
@@ -10,50 +11,53 @@ const login = async (req, res) => {
   }
 
   try {
-    // Buscar el usuario en la base de datos incluyendo el cargo
+    // Buscar el usuario y traer su cargo
     const user = await Personal.findOne({
       where: { usuario, estado: 1 },
-      include: [{ model: Cargo, attributes: ["nombre"] }] // Relación con Cargo
+      include: [{ model: Cargo, attributes: ["nombre"] }]
     });
 
     if (!user) {
       return res.status(404).json({ message: "Usuario no encontrado" });
     }
 
-    // Comparar contraseñas directamente (⚠️ Se recomienda encriptarlas con bcrypt)
-    if (user.password !== password) {
+    // Comparar contraseña encriptada
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
       return res.status(401).json({ message: "Contraseña incorrecta" });
     }
 
-    // Obtener el nombre del cargo si existe
+    // Obtener nombre del cargo
     const cargoNombre = user.Cargo ? user.Cargo.nombre : "Sin cargo";
 
-    // Generar el token JWT, incluyendo nombre del cargo
+    // Generar token JWT
     const token = jwt.sign(
-      { 
-        id: user.id, 
-        usuario: user.usuario, 
+      {
+        id: user.id,
+        usuario: user.usuario,
         nombre: user.nombre,
         apellido: user.apellido,
-        cargo: cargoNombre // Ahora devuelve el nombre del cargo en el token
+        cargo: cargoNombre // Incluimos el cargo
       },
       process.env.JWT_SECRET,
       { expiresIn: "1h" }
     );
 
-    // Responder con el token y datos del usuario
-    res.status(200).json({ 
-      message: "Login exitoso", 
-      token, 
-      id: user.id, 
-      nombre: user.nombre, 
-      apellido: user.apellido, 
+    // Respuesta con token y datos
+    res.status(200).json({
+      message: "Login exitoso",
+      token,
+      id: user.id,
+      nombre: user.nombre,
+      apellido: user.apellido,
       usuario: user.usuario,
-      cargo: cargoNombre // Enviar el cargo en la respuesta
+      cargo: cargoNombre
     });
-
   } catch (err) {
-    res.status(500).json({ message: "Error al iniciar sesión", error: err.message });
+    res.status(500).json({
+      message: "Error al iniciar sesión",
+      error: err.message
+    });
   }
 };
 

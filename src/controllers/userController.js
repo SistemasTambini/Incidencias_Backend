@@ -1,6 +1,6 @@
 const Personal = require("../models/personal");
 const Cargo = require("../models/cargo")
-const sequelize = require("../config/dbConfig"); 
+const { sequelize } = require("../config/dbConfig");  
 
 // Obtener todos los usuarios activos (estado = 1) con nombre y apellido concatenados
 const getAllUsuarios = async (req, res) => {

@@ -3,7 +3,7 @@ const path = require("path");
 const Producto = require("../models/producto");
 const EtiquetaQR = require("../models/etiquetaQR");
 const { QueryTypes } = require('sequelize');
-const sequelize = require('../config/dbConfig'); // Conexión a la base de datos
+const { sequelize } = require("../config/dbConfig"); // Conexión a la base de datos
 
 // Crear un producto
 const crearProducto = async (req, res) => {
@@ -57,7 +57,7 @@ const crearProducto = async (req, res) => {
       try {
         // Mover la imagen a la ubicación final
         fs.renameSync(req.file.path, targetPath);
-        Url_image = `http://192.168.1.200:3000/assets/productos/${imageName}`;
+        Url_image = `http://192.168.1.20:3000/assets/productos/${imageName}`;
 
         // Actualizar la URL de la imagen en la base de datos
         producto.Url_image = Url_image;
@@ -73,7 +73,7 @@ const crearProducto = async (req, res) => {
     // Crear la etiqueta QR
     const etiquetaQR = await EtiquetaQR.create({
       Codigo: `QR-${producto.ID_Producto}`,
-      URL_Info_Equipo: `http://192.168.1.200:3000/api/producto/${producto.ID_Producto}`,
+      URL_Info_Equipo: `http://192.168.1.20:3000/api/producto/${producto.ID_Producto}`,
       Fecha_Generacion: fechaGMT5,
       ID_Producto: producto.ID_Producto,
     });
@@ -161,7 +161,7 @@ const guardarQR = async (req, res) => {
     // Mover el archivo a la carpeta de QR
     fs.renameSync(req.file.path, qrPath);
 
-    const qrUrl = `http://192.168.1.200:3000/assets/QR/${qrName}`;
+    const qrUrl = `http://192.168.1.20:3000/assets/QR/${qrName}`;
 
     // Actualizar la columna QR_Code en la base de datos
     producto.QR_Code = qrUrl;
