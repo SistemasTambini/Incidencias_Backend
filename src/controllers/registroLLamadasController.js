@@ -1,7 +1,8 @@
 const RegistroLlamadas = require("../models/registroLlamadas");
 const { QueryTypes } = require('sequelize');
-const sequelize = require('../config/dbConfig');
+const {sequelize} = require('../config/dbConfig');
 const Usuario = require("../models/usuario");
+const { Op } = require("sequelize");
 // Crear nuevo registro
 const crearRegistro = async (req, res) => {
   try {
@@ -44,6 +45,11 @@ const obtenerRegistros = async (req, res) => {
   try {
     // const registros = await RegistroLlamadas.findAll();
     const registros = await RegistroLlamadas.findAll({
+       where: {
+        estado: {
+          [Op.ne]: 0   // not equal (<>)
+        }
+      },
       order: [["id", "DESC"]]
     });
     res.status(200).json(registros);
@@ -173,30 +179,53 @@ const obtenerPersonalxArea = async (req, res) => {
   }
 };
 
+
 const UpdateRegistroLlamadas = async (req, res) => {
   try {
-    const { id } = req.params; 
-    const { area, asesor, tipo, contacto, motivo } = req.body;
+    const { id } = req.params;
+    const { area, id_asesor, tipo, contacto, motivo } = req.body;
 
+    // 🔍 Buscar el registro existente
     const registro_llamadas = await RegistroLlamadas.findByPk(id);
     if (!registro_llamadas) {
       return res.status(404).json({ error: "Registro de llamada no encontrado" });
     }
 
+    // 🔎 Buscar al asesor por su ID
+    const asesor = await Usuario.findByPk(id_asesor);
+    if (!asesor) {
+      return res.status(404).json({ error: `No se encontró un usuario con ID ${id_asesor}` });
+    }
+
+    // 🧠 Actualizar los campos
     registro_llamadas.area = area;
-    registro_llamadas.asesor = asesor;
+    registro_llamadas.id_asesor = asesor.id; // ✅ Guarda el ID real del asesor
+
+    // ⚠️ Ajusta esta línea según tu modelo de Usuario
+    // Si tu tabla tiene campos `nombre` y `apellido`, concatenamos:
+    registro_llamadas.asesor = `${asesor.nombre} ${asesor.apellido}`.trim();
+
+    registro_llamadas.telefono = asesor.telefono || null; // ✅ Guarda el teléfono del asesor
     registro_llamadas.tipo = tipo;
     registro_llamadas.contacto = contacto;
     registro_llamadas.motivo = motivo;
+    registro_llamadas.estado = 1;
+    registro_llamadas.Estado_envio_wp=0;
 
+    // 💾 Guardar los cambios
     await registro_llamadas.save();
 
-    res.json({ message: "Registro de llamada actualizado correctamente" });
+    res.json({
+      message: "Registro de llamada actualizado correctamente",
+      data: registro_llamadas,
+    });
   } catch (error) {
-    console.error("Error al actualizar llamada:", error);
+    console.error("❌ Error al actualizar llamada:", error);
     res.status(500).json({ error: "Error al actualizar el registro de llamada" });
   }
 };
+
+
 
 const getReporteLLamadas = async (req, res) => {
   try {

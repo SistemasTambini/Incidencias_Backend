@@ -4,6 +4,10 @@ const Producto = require("../models/producto");
 const EtiquetaQR = require("../models/etiquetaQR");
 const { QueryTypes } = require('sequelize');
 const { sequelize } = require("../config/dbConfig"); // Conexión a la base de datos
+const { generarQRArchivo } = require('../utils/generarQR');
+
+// Usa .env si quieres (ej. BASE_PUBLIC_URL=http://192.168.1.200:3000)
+const BASE_PUBLIC_URL = process.env.BASE_PUBLIC_URL || 'http://192.168.1.20:3000';
 
 // Crear un producto
 const crearProducto = async (req, res) => {
@@ -73,7 +77,7 @@ const crearProducto = async (req, res) => {
     // Crear la etiqueta QR
     const etiquetaQR = await EtiquetaQR.create({
       Codigo: `QR-${producto.ID_Producto}`,
-      URL_Info_Equipo: `http://192.168.1.20:3000/api/producto/${producto.ID_Producto}`,
+      URL_Info_Equipo: `http://192.168.1.20:3000/api/producto-public/${producto.ID_Producto}`,
       Fecha_Generacion: fechaGMT5,
       ID_Producto: producto.ID_Producto,
     });
@@ -180,6 +184,81 @@ const guardarQR = async (req, res) => {
   }
 };
 
+async function crearQR(req, res) {
+  try {
+    const { data, productoId, overwrite = true, nombre } = req.body || {};
+
+    if (!data || !String(data).trim()) {
+      return res.status(400).json({ mensaje: 'El campo "data" es requerido.' });
+    }
+
+    // Si viene productoId, validamos y preparamos nombre estándar
+    let producto = null;
+    let nombreArchivo = nombre;
+    if (productoId) {
+      producto = await Producto.findOne({ where: { ID_Producto: productoId } });
+      if (!producto) {
+        return res.status(404).json({ mensaje: 'Producto no encontrado.' });
+      }
+      // Nombre por defecto si no envían uno
+      nombreArchivo = nombreArchivo || `QR-${producto.ID_Producto}.png`;
+    } else {
+      // Si no hay producto, también garantizamos un nombre
+      const slug = (nombre && String(nombre).trim()) || `QR-${Date.now()}.png`;
+      nombreArchivo = slug.endsWith('.png') ? slug : `${slug}.png`;
+    }
+
+    // Generar archivo PNG
+    await generarQRArchivo({
+      data: String(data),
+      nombreArchivo,
+      carpetaRelativa: ['public', 'assets', 'QR'],
+    });
+
+    const urlPublica = `${BASE_PUBLIC_URL}/assets/QR/${nombreArchivo}`;
+
+    // Si hay producto, actualizamos su QR_Code (respetando overwrite)
+    let etiquetaQR = null;
+    if (producto) {
+      if (overwrite || !producto.QR_Code) {
+        producto.QR_Code = urlPublica;
+        await producto.save();
+      }
+      // Crear/actualizar EtiquetaQR (opcional)
+      etiquetaQR = await EtiquetaQR.findOne({ where: { ID_Producto: producto.ID_Producto } });
+      if (!etiquetaQR) {
+        etiquetaQR = await EtiquetaQR.create({
+          Codigo: `QR-${producto.ID_Producto}`,
+          URL_Info_Equipo: String(data),
+          Fecha_Generacion: new Date(),
+          ID_Producto: producto.ID_Producto,
+        });
+      } else {
+        etiquetaQR.URL_Info_Equipo = String(data);
+        etiquetaQR.Fecha_Generacion = new Date();
+        await etiquetaQR.save();
+      }
+    }
+
+    return res.status(201).json({
+      mensaje: 'QR generado y almacenado correctamente.',
+      file: {
+        name: nombreArchivo,
+        url: urlPublica,
+        path: `/assets/QR/${nombreArchivo}`,
+      },
+      producto: producto || undefined,
+      etiquetaQR: etiquetaQR || undefined,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      mensaje: 'Error al generar el QR',
+      error: error.message,
+    });
+  }
+}
+
+
 
 const editarProducto = async (req, res) => {
   const { ID_Producto } = req.params; // Obtener el ID del producto desde los parámetros
@@ -266,4 +345,51 @@ const eliminarProducto = async (req, res) => {
 };
 
 
-module.exports = { crearProducto, getProductoById, MostrarListadoProducto, guardarQR, editarProducto, eliminarProducto };
+//  Endpoint público para visualizar el QR SIN token
+const getProductoPublicById = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const producto = await Producto.findOne({
+      where: { ID_Producto: id },
+    });
+
+    if (!producto) {
+      return res.status(404).json({ message: "Producto no encontrado" });
+    }
+
+    res.status(200).json({
+      ID_Producto: producto.ID_Producto,
+      Nombre: producto.Nombre,
+      Descripcion: producto.Descripcion,
+      Marca: producto.Marca,
+      Modelo: producto.Modelo,
+      Numero_Serie: producto.Numero_Serie,
+      Cantidad: producto.Cantidad,
+      Estado: producto.Estado,
+      Url_image: producto.Url_image,
+      Fecha_creacion: producto.Fecha_creacion,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Error al obtener producto público",
+      error: error.message,
+    });
+  }
+};
+
+module.exports = {
+  crearProducto,
+  getProductoById,
+  MostrarListadoProducto,
+  guardarQR,
+  editarProducto,
+  eliminarProducto,
+  crearQR,
+  getProductoPublicById, // 👈 agregado
+};
+
+
+
+
+module.exports = { crearProducto, getProductoById, MostrarListadoProducto, guardarQR, editarProducto, eliminarProducto,crearQR, getProductoPublicById };

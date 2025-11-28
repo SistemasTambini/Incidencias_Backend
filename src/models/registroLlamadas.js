@@ -7,6 +7,14 @@ const RegistroLlamadas = sequelize.define("RegistroLlamadas", {
     autoIncrement: true,
     primaryKey: true,
   },
+  id_movlim: {
+    type: DataTypes.STRING(255),
+    allowNull: true,
+  },
+  cliente: {
+    type: DataTypes.STRING(255),
+    allowNull: true,
+  },
   fecha_recordatorio: {
     type: DataTypes.DATE,
     allowNull: true,
@@ -24,6 +32,10 @@ const RegistroLlamadas = sequelize.define("RegistroLlamadas", {
     allowNull: false,
   },
   asesor: {
+    type: DataTypes.STRING(255),
+    allowNull: true,
+  },
+  cliente:{
     type: DataTypes.STRING(255),
     allowNull: true,
   },
@@ -48,7 +60,7 @@ const RegistroLlamadas = sequelize.define("RegistroLlamadas", {
   estado: {
     type: DataTypes.INTEGER,
     allowNull: true,
-    comment: "1=Pendiente, 2=Respondido (ajústalo según tu lógica)",
+    comment: "1=Pendiente, 2=Respondido ",
   },
   fecha_respuesta: {
     type: DataTypes.DATE,

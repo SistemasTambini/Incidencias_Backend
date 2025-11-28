@@ -1,5 +1,29 @@
 const Categoria = require("../models/categoria");
 
+
+// Crear categoria nueva
+const createCategoria = async (req, res) => {
+  const { Nombre, Descripcion } = req.body;
+
+  // Validación de los campos requeridos
+  if (!Nombre || !Descripcion) {
+    return res.status(400).json({ message: "Todos los campos son requeridos" });
+  }
+
+  try {
+    const nuevaCategoria = await Categoria.create({
+      Nombre,
+      Descripcion,
+      Estado: '1', 
+    });
+    res.status(201).json({ message: "categoria creada exitosamente", categoria: nuevaCategoria });
+  } catch (err) {
+    res.status(500).json({ message: "Error al crear la categoria", error: err.message });
+  }
+};
+
+
+
 // Obtener todas las categorías activas (estado = 1) y ordenadas por nombre de forma ascendente
 const getAllCategorias = async (req, res) => {
   try {
@@ -44,4 +68,4 @@ const getCategoriaById = async (req, res) => {
   }
 };
 
-module.exports = { getAllCategorias, getAllCategoriasAll, getCategoriaById };
+module.exports = { getAllCategorias, getAllCategoriasAll, getCategoriaById,createCategoria };

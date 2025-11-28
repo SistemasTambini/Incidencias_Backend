@@ -20,6 +20,7 @@ const correspondenciaRoutes = require("./correspondenciaRoutes");
 const calificacionRoutes = require("./calificacionRoutes");
 const permisoViajeRoutes = require("./permisoViajeRoutes");
 const registroLLamadasRoutes = require("./registroLLamadasRoutes");
+const asesorRoutes = require("./asesorRoutes");
 
 const router = express.Router();
 
@@ -42,6 +43,7 @@ router.use("/correspondencia", correspondenciaRoutes);
 router.use("/calificacion", calificacionRoutes);
 router.use("/permiso_viaje", permisoViajeRoutes);
 router.use("/registroLLamadas", registroLLamadasRoutes);
+router.use("/asesores", asesorRoutes);
 router.use("/", recordatorioRoutes);
 
 module.exports = router;

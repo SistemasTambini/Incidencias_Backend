@@ -1,20 +1,30 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const Personal = require("../models/personal");
+// const Personal = require("../models/personal");
 const Cargo = require("../models/cargo");
+const Usuario = require("../models/usuario");
+const Area = require("../models/area");
 
 const login = async (req, res) => {
   const { usuario, password } = req.body;
 
   if (!usuario || !password) {
-    return res.status(400).json({ message: "Usuario y contraseña son requeridos" });
+    return res
+      .status(400)
+      .json({ message: "Usuario y contraseña son requeridos" });
   }
 
   try {
     // Buscar el usuario y traer su cargo
-    const user = await Personal.findOne({
-      where: { usuario, estado: 1 },
-      include: [{ model: Cargo, attributes: ["nombre"] }]
+    // const user = await Personal.findOne({
+    const user = await Usuario.findOne({
+      // where: { usuario, estado: 1 },
+      where: { usuario, Estado: 1 },
+      // include: [{ model: Cargo, attributes: ["nombre"] }]
+      include: [
+        { model: Cargo, attributes: ["nombre"] },
+        { model: Area, as: "areaData", attributes: ["nombre"] }, // 👈 incluir el nombre del área
+      ],
     });
 
     if (!user) {
@@ -29,6 +39,7 @@ const login = async (req, res) => {
 
     // Obtener nombre del cargo
     const cargoNombre = user.Cargo ? user.Cargo.nombre : "Sin cargo";
+    const areaNombre = user.areaData ? user.areaData.nombre : "Sin área";
 
     // Generar token JWT
     const token = jwt.sign(
@@ -37,7 +48,9 @@ const login = async (req, res) => {
         usuario: user.usuario,
         nombre: user.nombre,
         apellido: user.apellido,
-        cargo: cargoNombre // Incluimos el cargo
+        cargo: cargoNombre,
+        documento: user.documento,
+        area: areaNombre,
       },
       process.env.JWT_SECRET,
       { expiresIn: "1h" }
@@ -51,12 +64,14 @@ const login = async (req, res) => {
       nombre: user.nombre,
       apellido: user.apellido,
       usuario: user.usuario,
-      cargo: cargoNombre
+      cargo: cargoNombre,
+      documento: user.documento,
+      area: areaNombre,
     });
   } catch (err) {
     res.status(500).json({
       message: "Error al iniciar sesión",
-      error: err.message
+      error: err.message,
     });
   }
 };

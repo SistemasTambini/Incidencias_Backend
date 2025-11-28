@@ -1,11 +1,12 @@
 const Personal = require("../models/personal");
-const Cargo = require("../models/cargo")
+const Cargo = require("../models/cargo");
+const Usuario = require("../models/usuario")
 const { sequelize } = require("../config/dbConfig");  
 
 // Obtener todos los usuarios activos (estado = 1) con nombre y apellido concatenados
 const getAllUsuarios = async (req, res) => {
   try {
-    const usuarios = await Personal.findAll({
+    const usuarios = await Usuario.findAll({
       attributes: [
         [sequelize.literal("CONCAT(nombre, ' ', apellido)"), "nombreCompleto"],
       ],
@@ -174,13 +175,11 @@ const updateUserState = async (req, res) => {
 };
 
 
-
-
 const postUser = async (req, res) => {
-  const { usuario, nombre, apellido, correo, password, cargo } = req.body;
+  const { usuario, nombre, apellido,documento,correo, password, cargo } = req.body;
 
   // Verificar que los campos requeridos estén presentes
-  if (!usuario || !nombre || !apellido || !correo || !password || !cargo) {
+  if (!usuario || !nombre || !apellido ||!documento|| !correo || !password || !cargo) {
     return res.status(400).json({ error: "Todos los campos son obligatorios." });
   }
 
@@ -203,6 +202,7 @@ const postUser = async (req, res) => {
       nombre,
       apellido,
       correo,
+      documento,
       password,
       cargo,
       estado: "1", // Estado por defecto

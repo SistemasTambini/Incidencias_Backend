@@ -2,25 +2,32 @@
   "name": "api-tambini",
   "version": "1.0.0",
   "main": "server.js",
-  "scripts": {
-    "start": "nodemon server.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "description": "",
+  "scripts": {
+    "dev": "nodemon server.js",
+    "start:prod": "node server.js"
+  },
+  "license": "ISC",
   "dependencies": {
     "bcrypt": "^6.0.0",
     "cors": "^2.8.5",
+    "docxtemplater": "^3.66.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
+    "express-rate-limit": "^8.0.1",
+    "express-slow-down": "^2.1.0",
     "jsonwebtoken": "^9.0.2",
+    "mammoth": "^1.11.0",
     "multer": "^1.4.5-lts.1",
     "mysql": "^2.18.1",
     "mysql2": "^3.11.5",
-    "nodemon": "^3.1.9",
+    "office-to-pdf": "^4.0.0",
+    "pizzip": "^3.2.0",
+    "qrcode": "^1.5.4",
     "sequelize": "^6.37.5",
     "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9"
   }
 }

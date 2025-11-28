@@ -8,12 +8,20 @@ const {
   guardarQR,
   editarProducto,
   eliminarProducto,
+  crearQR,
+  getProductoPublicById 
 } = require("../controllers/productoController");
 
 // Rutas estáticas primero (orden jerárquico)
 router.post("/guardarQR", uploadQRCode, guardarQR); // Guardar QR debe ir antes de las dinámicas
 router.post("/", uploadProductImage, crearProducto); // Crear producto
 router.get("/listado_productos", MostrarListadoProducto); // Obtener el listado de productos
+// Endpoint genérico para crear/regenerar QR
+router.post('/qr', crearQR);
+
+// 🚀 Ruta pública (NO requiere token)
+router.get("/public/:id", getProductoPublicById);
+
 
 // Rutas dinámicas después (orden más específico)
 router.get("/:id", getProductoById); // Obtener un producto por ID
